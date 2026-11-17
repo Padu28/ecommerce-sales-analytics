@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "basketlens"
+version = "2.0.0"
+description = "E-commerce customer behaviour and sales analytics: RFM segments, market baskets, anomalies, forecasting and an interactive dashboard."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Padmashree Shah", email = "Padmashreeshah@gmail.com" }]
+keywords = ["ecommerce", "retail analytics", "rfm", "market basket analysis", "customer segmentation", "pyspark", "hive", "power bi"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = ["pandas>=1.5", "numpy>=1.23"]
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.1"]
+download = ["ucimlrepo>=0.0.7"]
+notebook = ["matplotlib>=3.6", "jupyter"]
+bigdata = ["pyspark>=3.4", "pymongo>=4.0", "cassandra-driver>=3.28"]
+dev = ["pytest>=7", "ruff==0.16.9"]
+
+[project.scripts]
+basketlens = "basketlens.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Padu28/ecommerce-sales-analytics"
+Dashboard = "https://padu28.github.io/ecommerce-sales-analytics/"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 115
+target-version = "py39"
+src = ["src", "tests", "scripts", "bigdata"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]

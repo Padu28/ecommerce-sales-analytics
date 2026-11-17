@@ -1,0 +1,16 @@
+# Core pipeline
+pandas>=1.5
+numpy>=1.23
+
+# Optional: notebook charts, Excel input, official dataset download
+matplotlib>=3.6
+openpyxl>=3.1
+ucimlrepo>=0.0.7
+
+# Optional: big-data layer (only needed for bigdata/ scripts)
+# pyspark>=3.4
+# pymongo>=4.0
+# cassandra-driver>=3.28
+
+# Development
+pytest>=7

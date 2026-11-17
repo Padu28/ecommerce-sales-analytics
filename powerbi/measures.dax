@@ -1,0 +1,63 @@
+// BasketLens: DAX measures for Power BI
+// Tables (import from data/processed/):
+//   clean_sales            line-level valid sales (includes guest checkouts with blank CustomerID)
+//   customer_rfm_segments  one row per customer
+//   cancellations          cancellation / return lines (negative Quantity)
+//   basket_rules, product_sales, daily_sales, forecast, anomalies  (optional pages)
+// Relationship: customer_rfm_segments[CustomerID] 1 -> * clean_sales[CustomerID]
+// Recommended: a Date table marked as date table, related to clean_sales[InvoiceDate] (date part).
+
+// ---------- core KPIs (original project) ----------
+Total Revenue = SUM ( clean_sales[Revenue] )
+Total Orders = DISTINCTCOUNT ( clean_sales[InvoiceNo] )
+Total Customers = DISTINCTCOUNT ( clean_sales[CustomerID] )
+Units Sold = SUM ( clean_sales[Quantity] )
+Average Order Value = DIVIDE ( [Total Revenue], [Total Orders], 0 )
+Revenue per Customer =
+DIVIDE ( CALCULATE ( [Total Revenue], NOT ISBLANK ( clean_sales[CustomerID] ) ), [Total Customers], 0 )
+Repeat Customers =
+COUNTROWS (
+    FILTER (
+        VALUES ( clean_sales[CustomerID] ),
+        NOT ISBLANK ( clean_sales[CustomerID] ) && CALCULATE ( DISTINCTCOUNT ( clean_sales[InvoiceNo] ) ) > 1
+    )
+)
+Repeat Customer Rate = DIVIDE ( [Repeat Customers], [Total Customers], 0 )
+
+// ---------- new in v2 ----------
+Guest Revenue Share =
+DIVIDE ( CALCULATE ( [Total Revenue], ISBLANK ( clean_sales[CustomerID] ) ), [Total Revenue], 0 )
+
+Cancelled Value = - SUMX ( cancellations, cancellations[Quantity] * cancellations[UnitPrice] )
+Cancellation Rate = DIVIDE ( [Cancelled Value], [Total Revenue] + [Cancelled Value], 0 )
+
+Revenue PY = CALCULATE ( [Total Revenue], DATEADD ( 'Date'[Date], -1, YEAR ) )
+Revenue MoM % =
+VAR prev = CALCULATE ( [Total Revenue], DATEADD ( 'Date'[Date], -1, MONTH ) )
+RETURN DIVIDE ( [Total Revenue] - prev, prev )
+Revenue 7d Avg =
+AVERAGEX ( DATESINPERIOD ( 'Date'[Date], MAX ( 'Date'[Date] ), -7, DAY ), CALCULATE ( [Total Revenue] ) )
+
+International Revenue Share =
+DIVIDE ( CALCULATE ( [Total Revenue], clean_sales[Country] <> "United Kingdom" ), [Total Revenue], 0 )
+
+Top 10% Customer Revenue Share =
+VAR n = ROUNDUP ( [Total Customers] * 0.1, 0 )
+VAR topCustomers =
+    TOPN ( n, FILTER ( VALUES ( clean_sales[CustomerID] ), NOT ISBLANK ( clean_sales[CustomerID] ) ), [Total Revenue] )
+RETURN DIVIDE ( CALCULATE ( [Total Revenue], topCustomers ), [Total Revenue], 0 )
+
+At Risk Revenue =
+CALCULATE ( SUM ( customer_rfm_segments[Monetary] ), customer_rfm_segments[Segment] = "At Risk" )
+Expected Revenue 12m = SUM ( customer_rfm_segments[CLV_12m] )
+Churned Customers = CALCULATE ( COUNTROWS ( customer_rfm_segments ), customer_rfm_segments[Churned] = TRUE () )
+
+Forecast Next 30 Days = SUM ( forecast[Forecast] )
+
+// ---------- helper columns (Modeling > New column) ----------
+// clean_sales[Order Date]    = DATEVALUE ( clean_sales[InvoiceDate] )
+// clean_sales[Weekday No]    = WEEKDAY ( clean_sales[InvoiceDate], 2 )
+// customer_rfm_segments[Segment Order] =
+//     SWITCH ( customer_rfm_segments[Segment], "Champions", 1, "Loyal Customers", 2, "New/Promising", 3,
+//              "Need Attention", 4, "At Risk", 5, "Hibernating", 6 )
+// 'Date' = CALENDAR ( DATE ( 2010, 12, 1 ), DATE ( 2011, 12, 31 ) )

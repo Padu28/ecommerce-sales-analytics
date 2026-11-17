@@ -1,0 +1,6 @@
+rule,removed,remaining,detail
+Raw transaction lines,0,46495,
+Unreadable or incomplete lines,0,46495,"Missing invoice, product, date, quantity or price"
+Cancellations and returns,841,45654,Kept separately for returns analysis
+Zero quantity or price,80,45574,"Free samples, adjustments, test lines"
+No customer ID (guest checkout),4287,41287,"Counted in revenue views, excluded from customer analytics"

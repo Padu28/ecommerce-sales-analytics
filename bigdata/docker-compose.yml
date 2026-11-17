@@ -1,0 +1,35 @@
+# Local NoSQL stack for BasketLens.
+#   docker compose -f bigdata/docker-compose.yml up -d
+#   docker compose -f bigdata/docker-compose.yml down        (add -v to delete data)
+services:
+  mongodb:
+    image: mongo:7
+    container_name: basketlens-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      retries: 5
+
+  cassandra:
+    image: cassandra:4.1
+    container_name: basketlens-cassandra
+    ports:
+      - "9042:9042"
+    environment:
+      CASSANDRA_CLUSTER_NAME: basketlens
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 128M
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'describe keyspaces' || exit 1"]
+      interval: 20s
+      retries: 10
+
+volumes:
+  mongo-data:
+  cassandra-data:

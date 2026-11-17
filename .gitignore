@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.env
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# Big data outputs
+warehouse/
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Full dataset (download with `basketlens download`) and private data
+data/raw/online_retail_full.csv
+data/raw/*.xlsx
+data/raw/private_*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+~$*.pbix

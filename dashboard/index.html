@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BasketLens: e-commerce customer and sales analytics</title>
+  <meta name="description" content="Interactive e-commerce analytics: revenue pulse, customer segments, market baskets, products, markets and data quality.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <aside class="side" aria-label="Main navigation">
+    <div class="logo">
+      <svg viewBox="0 0 36 36" aria-hidden="true">
+        <rect x="3" y="11" width="30" height="22" rx="5" fill="var(--plum)"/>
+        <rect x="15.5" y="11" width="5" height="22" fill="var(--marigold)"/>
+        <path d="M18 11c-3-6-10-6-9-1 1 3 6 2 9 1Zm0 0c3-6 10-6 9-1-1 3-6 2-9 1Z" fill="none" stroke="var(--marigold)" stroke-width="2.4" stroke-linejoin="round"/>
+        <circle cx="18" cy="22" r="5.5" fill="none" stroke="#fff" stroke-width="2.2"/>
+        <path d="m22 26 4 4" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      <div><strong>BasketLens</strong><span>Commerce analytics</span></div>
+    </div>
+    <nav class="nav" role="tablist" aria-orientation="vertical">
+      <button role="tab" data-view="overview" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M3 13h4v8H3zM10 8h4v13h-4zM17 3h4v18h-4z"/></svg><span>Overview</span></button>
+      <button role="tab" data-view="products" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 8 12 4l8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8" fill="none" stroke-width="2"/></svg><span>Products</span></button>
+      <button role="tab" data-view="baskets" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="6" cy="7" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="13" cy="18" r="3"/><path d="m8.5 8.5 3 7M9 6.8l6-.6M15.7 8.3l-1.7 7" fill="none" stroke-width="2"/></svg><span>Basket analysis</span></button>
+      <button role="tab" data-view="customers" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7zM16 4a4 4 0 0 1 0 8M18 14c2.5 1 4 3.6 4 7h-3"/></svg><span>Customers</span></button>
+      <button role="tab" data-view="markets" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke-width="2"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke-width="2"/></svg><span>Markets</span></button>
+      <button role="tab" data-view="operations" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 5h16l-6 8v6l-4 2v-8z"/></svg><span>Data and returns</span></button>
+    </nav>
+    <div class="side-foot" id="sideFoot"></div>
+  </aside>
+
+  <div class="shell">
+    <header class="top">
+      <div class="range">
+        <span class="range-label">Showing</span>
+        <strong id="rangeText">Full period</strong>
+        <div class="quick" role="group" aria-label="Quick date ranges">
+          <button data-range="all">Full year</button>
+          <button data-range="q4">Q4</button>
+          <button data-range="90">Last 90 days</button>
+          <button data-range="30">Last 30 days</button>
+        </div>
+      </div>
+      <div class="tools">
+        <label class="sel"><span class="sr-only">Country</span><select id="country"><option value="">All countries</option></select></label>
+        <button class="cmd" id="cmdOpen" aria-label="Search products, customers and pages">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="m14 14 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>Search</span><kbd>Ctrl K</kbd>
+        </button>
+        <button class="icon" id="printBtn" aria-label="Export report as PDF" title="Export report (PDF)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M7 14h10v7H7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="icon" id="themeBtn" aria-label="Switch colour theme" title="Switch theme (D)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- OVERVIEW -->
+      <section class="view" id="view-overview">
+        <div class="pulse card">
+          <div class="pulse-head">
+            <div>
+              <h1>Revenue pulse</h1>
+              <p>Daily revenue with its 7-day average, unusual days and a 30-day forecast. Drag across the chart to analyse any period.</p>
+            </div>
+            <div class="legend-inline" id="pulseLegend"></div>
+          </div>
+          <div id="pulseChart" class="chart pulse-chart" aria-label="Daily revenue chart. Drag to select a date range."></div>
+        </div>
+
+        <div class="kpis" id="kpis"></div>
+
+        <div class="grid g-2-1">
+          <article class="card">
+            <header><h2>What changed</h2><p id="insightSub">Compared with the previous period of the same length.</p></header>
+            <ul class="insights" id="insights"></ul>
+          </article>
+          <article class="card">
+            <header><h2>Forecast, next 30 days</h2><p>Baseline from recent trend and weekday pattern.</p></header>
+            <div id="forecastBox"></div>
+          </article>
+        </div>
+
+        <div class="grid g-1-1">
+          <article class="card">
+            <header><h2>When customers order</h2><p>Orders by weekday and hour. The business doesn't trade on Saturdays.</p></header>
+            <div id="heatmap" class="chart"></div>
+          </article>
+          <article class="card">
+            <header><h2>Top markets</h2><p>Revenue in the selected period.</p></header>
+            <div id="topMarkets" class="chart"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- PRODUCTS -->
+      <section class="view" id="view-products" hidden>
+        <div class="view-head">
+          <div><h1>Products</h1><p>ABC classification ranks products by revenue: A products bring the first 80%, B the next 15%, C the last 5%.</p></div>
+        </div>
+        <div class="grid g-1-1">
+          <article class="card"><header><h2>Revenue concentration</h2><p id="abcNote"></p></header><div id="pareto" class="chart"></div></article>
+          <article class="card"><header><h2>Product mix</h2><p>Share of products and of revenue in each class.</p></header><div id="abcMix" class="abc-mix"></div></article>
+        </div>
+        <article class="card">
+          <div class="table-tools">
+            <label class="sel grow"><span class="sr-only">Search products</span><input id="prodSearch" type="search" placeholder="Search by name or stock code"></label>
+            <div class="chips" id="abcChips" role="group" aria-label="Filter by ABC class">
+              <button data-abc="" aria-pressed="true">All</button><button data-abc="A" aria-pressed="false">A</button><button data-abc="B" aria-pressed="false">B</button><button data-abc="C" aria-pressed="false">C</button>
+            </div>
+            <button class="btn ghost" data-export="products">Download CSV</button>
+          </div>
+          <div class="table-wrap"><table class="data" id="prodTable"></table></div>
+        </article>
+      </section>
+
+      <!-- BASKETS -->
+      <section class="view" id="view-baskets" hidden>
+        <div class="view-head">
+          <div><h1>What customers buy together</h1><p>Each line links two products that appear on the same invoice far more often than chance. Thicker lines mean a stronger link (higher lift). Select a product to see what to recommend with it.</p></div>
+        </div>
+        <div class="grid g-2-1">
+          <article class="card flush"><div id="network" class="chart network"></div></article>
+          <article class="card" id="recoPanel">
+            <header><h2>Recommendations</h2><p>Select a product in the map or search for one.</p></header>
+            <label class="sel full"><span class="sr-only">Choose a product</span><select id="recoSelect"></select></label>
+            <div id="recoList"></div>
+          </article>
+        </div>
+        <article class="card">
+          <div class="table-tools">
+            <h2 class="grow">Association rules</h2>
+            <label class="slider">Minimum lift <input type="range" id="liftMin" min="1" max="20" step="0.5" value="3"><output id="liftOut">3</output></label>
+            <button class="btn ghost" data-export="rules">Download CSV</button>
+          </div>
+          <p class="hint">Support: share of all invoices containing both. Confidence: chance the second is bought when the first is. Lift: how many times more likely than chance.</p>
+          <div class="table-wrap"><table class="data" id="ruleTable"></table></div>
+        </article>
+      </section>
+
+      <!-- CUSTOMERS -->
+      <section class="view" id="view-customers" hidden>
+        <div class="view-head">
+          <div><h1>Customers</h1><p>Segments from recency, frequency and spend (RFM). Select a segment to filter the chart and table.</p></div>
+        </div>
+        <div class="segments" id="segTiles"></div>
+        <div class="grid g-1-1">
+          <article class="card"><header><h2>Frequency and spend</h2><p>Each dot is a customer. Both axes use a log scale.</p></header><div id="scatter" class="chart"></div></article>
+          <article class="card"><header><h2>Do new customers come back?</h2><p>Share of each monthly cohort buying again in later months.</p></header><div class="table-wrap"><div id="cohort" class="cohort"></div></div></article>
+        </div>
+        <article class="card">
+          <div class="table-tools">
+            <label class="sel grow"><span class="sr-only">Search customers</span><input id="custSearch" type="search" placeholder="Search by customer ID"></label>
+            <button class="btn ghost" data-export="customers">Download CSV</button>
+          </div>
+          <div class="table-wrap"><table class="data" id="custTable"></table></div>
+        </article>
+      </section>
+
+      <!-- MARKETS -->
+      <section class="view" id="view-markets" hidden>
+        <div class="view-head"><div><h1>Markets</h1><p>Country performance in the selected period, with growth against the previous period.</p></div></div>
+        <div class="grid g-1-2">
+          <article class="card"><header><h2>Home vs international</h2><p id="intlNote"></p></header><div id="donut" class="chart"></div></article>
+          <article class="card"><header><h2>Average order value by market</h2><p>International customers tend to place fewer, larger orders.</p></header><div id="aovBars" class="chart"></div></article>
+        </div>
+        <article class="card">
+          <div class="table-tools"><h2 class="grow">All markets</h2><button class="btn ghost" data-export="markets">Download CSV</button></div>
+          <div class="table-wrap"><table class="data" id="marketTable"></table></div>
+        </article>
+      </section>
+
+      <!-- OPERATIONS -->
+      <section class="view" id="view-operations" hidden>
+        <div class="view-head"><div><h1>Data quality and returns</h1><p>How raw transactions become trusted figures, what is being returned, and which days looked unusual.</p></div></div>
+        <div class="grid g-1-1">
+          <article class="card"><header><h2>Data pipeline</h2><p>Rows kept and removed at each cleaning step.</p></header><div id="funnel"></div></article>
+          <article class="card"><header><h2>Cancelled value by month</h2><p id="cancelNote"></p></header><div id="cancelChart" class="chart"></div></article>
+        </div>
+        <div class="grid g-1-1">
+          <article class="card"><header><h2>Most returned products</h2><p>Share of units sold that came back.</p></header><div class="table-wrap"><table class="data" id="returnTable"></table></div></article>
+          <article class="card"><header><h2>Unusual trading days</h2><p>Days far above or below the norm for that weekday.</p></header><ul class="anoms" id="anomList"></ul></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot"><span id="footMeta"></span><span><kbd>Ctrl K</kbd> search, <kbd>1</kbd>–<kbd>6</kbd> pages, <kbd>D</kbd> theme, <kbd>Esc</kbd> close</span></footer>
+  </div>
+
+  <!-- drawer -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawerTitle">
+    <button class="icon close" id="drawerClose" aria-label="Close panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <div id="drawerBody"></div>
+  </aside>
+
+  <!-- command palette -->
+  <div class="palette" id="palette" hidden role="dialog" aria-modal="true" aria-label="Search">
+    <div class="palette-box">
+      <input id="paletteInput" type="text" placeholder="Search products, customers, markets or pages" autocomplete="off" aria-controls="paletteList">
+      <ul id="paletteList" role="listbox"></ul>
+      <div class="palette-foot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> open</span><span><kbd>Esc</kbd> close</span></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="print-head" aria-hidden="true"><strong>BasketLens executive report</strong><span id="printRange"></span></div>
+
+  <script src="data/basketlens_data.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
